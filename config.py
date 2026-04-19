@@ -16,15 +16,27 @@ RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
 EMBEDDINGS_DIR = DATA_DIR / "embeddings"
 
+# ── Pull secrets from Streamlit when available (Streamlit Cloud deployment) ────
+def _get(key: str, default: str = "") -> str:
+    """Read from env vars first, then Streamlit secrets if available."""
+    val = os.getenv(key, "")
+    if val:
+        return val
+    try:
+        import streamlit as st
+        return str(st.secrets.get(key, default))
+    except Exception:
+        return default
+
 # ── API keys ───────────────────────────────────────────────────────────────────
-GENIUS_API_KEY: str = os.getenv("GENIUS_API_KEY", "")
-GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
-SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
-SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", "")
+GENIUS_API_KEY: str = _get("GENIUS_API_KEY")
+GROQ_API_KEY: str = _get("GROQ_API_KEY")
+SUPABASE_URL: str = _get("SUPABASE_URL")
+SUPABASE_KEY: str = _get("SUPABASE_KEY")
 
 # ── Feature flags ──────────────────────────────────────────────────────────────
-DEMO_MODE: bool = os.getenv("DEMO_MODE", "false").lower() in ("true", "1", "yes")
-MOCK_MODE: bool = os.getenv("MOCK_MODE", "false").lower() in ("true", "1", "yes")
+DEMO_MODE: bool = _get("DEMO_MODE", "false").lower() in ("true", "1", "yes")
+MOCK_MODE: bool = _get("MOCK_MODE", "false").lower() in ("true", "1", "yes")
 
 # ── Domain constants ───────────────────────────────────────────────────────────
 DECADES: list[str] = ["1960s", "1970s", "1980s", "1990s", "2000s", "2010s", "2020s"]

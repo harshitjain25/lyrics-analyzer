@@ -19,20 +19,22 @@ class DBManager:
     def __init__(self) -> None:
         """Initialise the Supabase client (or skip in DEMO_MODE)."""
         self._client = None
-        if not DEMO_MODE:
+        # Auto-fallback to DEMO_MODE when credentials are absent
+        self._demo = DEMO_MODE or not SUPABASE_URL or not SUPABASE_KEY
+        if not self._demo:
             try:
                 from supabase import create_client
                 self._client = create_client(SUPABASE_URL, SUPABASE_KEY)
                 logger.info("Supabase client initialised")
             except Exception as exc:
-                logger.error(f"Failed to connect to Supabase: {exc}")
-                raise
+                logger.warning(f"Supabase unavailable, falling back to DEMO_MODE: {exc}")
+                self._demo = True
 
     # ── Writes ─────────────────────────────────────────────────────────────────
 
     def insert_songs(self, df: pd.DataFrame) -> None:
         """Upsert songs DataFrame into the songs table."""
-        if DEMO_MODE:
+        if self._demo:
             logger.info("DEMO_MODE: skipping insert_songs")
             return
         records = df.to_dict(orient="records")
@@ -45,7 +47,7 @@ class DBManager:
 
     def insert_topics(self, topics: list[dict[str, Any]]) -> None:
         """Insert topic label records."""
-        if DEMO_MODE:
+        if self._demo:
             logger.info("DEMO_MODE: skipping insert_topics")
             return
         try:
@@ -57,7 +59,7 @@ class DBManager:
 
     def insert_song_topics(self, assignments: list[dict[str, Any]]) -> None:
         """Insert song↔topic assignment records."""
-        if DEMO_MODE:
+        if self._demo:
             logger.info("DEMO_MODE: skipping insert_song_topics")
             return
         try:
@@ -69,7 +71,7 @@ class DBManager:
 
     def insert_sentiments(self, sentiments: list[dict[str, Any]]) -> None:
         """Upsert sentiment records (one row per song)."""
-        if DEMO_MODE:
+        if self._demo:
             logger.info("DEMO_MODE: skipping insert_sentiments")
             return
         try:
@@ -81,7 +83,7 @@ class DBManager:
 
     def insert_aspect_sentiments(self, aspects: list[dict[str, Any]]) -> None:
         """Insert aspect-sentiment records."""
-        if DEMO_MODE:
+        if self._demo:
             logger.info("DEMO_MODE: skipping insert_aspect_sentiments")
             return
         try:
@@ -95,7 +97,7 @@ class DBManager:
 
     def get_songs(self, genre: str | None = None, decade: str | None = None) -> pd.DataFrame:
         """Fetch songs, optionally filtered by genre and/or decade."""
-        if DEMO_MODE:
+        if self._demo:
             return self._load_sample(genre=genre, decade=decade)
         try:
             q = self._client.table("songs").select("*")
@@ -111,7 +113,7 @@ class DBManager:
 
     def get_dashboard_data(self) -> dict[str, pd.DataFrame]:
         """Return all tables needed by the dashboard as a dict of DataFrames."""
-        if DEMO_MODE:
+        if self._demo:
             return self._demo_dashboard_data()
         try:
             songs_df = pd.DataFrame(self._client.table("songs").select("*").execute().data)

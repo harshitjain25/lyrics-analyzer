@@ -1,0 +1,15 @@
+.env
+data/raw/
+data/embeddings/
+__pycache__/
+.DS_Store
+*.pyc
+models/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.idea/
+.vscode/
+*.ipynb_checkpoints/

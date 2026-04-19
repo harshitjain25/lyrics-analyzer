@@ -1,26 +1,15 @@
-groq
-lyricsgenius
-bertopic
-sentence-transformers
-transformers
-torch
-datasets
+# Dashboard + deployment (Streamlit Community Cloud)
 streamlit
 plotly
 pandas
 numpy
-scikit-learn
 supabase
 python-dotenv
-umap-learn
-hdbscan
-nltk
-spacy
-gensim
-evaluate
-tqdm
-huggingface-hub
-langdetect
 loguru
-wordcloud
+groq
 scipy
+scikit-learn
+sentence-transformers
+torch --index-url https://download.pytorch.org/whl/cpu
+huggingface-hub
+tqdm

@@ -1,0 +1,14 @@
+# Full pipeline dependencies (run locally, not on Streamlit Cloud)
+-r requirements.txt
+lyricsgenius
+bertopic
+transformers
+datasets
+umap-learn
+hdbscan
+nltk
+spacy
+gensim
+evaluate
+langdetect
+wordcloud

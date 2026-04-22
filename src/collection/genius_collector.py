@@ -108,6 +108,13 @@ class GeniusCollector:
                     title = song_data.get("title", "")
                     rdc = song_data.get("release_date_components") or {}
                     year = int(rdc.get("year") or 0) if isinstance(rdc, dict) else 0
+                    # Fallback: parse year from release_date string "2017-03-03"
+                    if not year:
+                        rd = song_data.get("release_date_for_display") or song_data.get("release_date") or ""
+                        import re
+                        m = re.search(r"(19[6-9]\d|20[0-2]\d)", str(rd))
+                        if m:
+                            year = int(m.group(1))
                     album_data = song_data.get("album") or {}
                     album_name = album_data.get("name", "") if isinstance(album_data, dict) else ""
                     lyrics = self._fetch_lyrics(song_data.get("id"))

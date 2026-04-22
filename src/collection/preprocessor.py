@@ -51,6 +51,12 @@ class LyricsPreprocessor:
         df = df[(df["word_count"] >= 50) & (df["word_count"] <= 2000)].reset_index(drop=True)
         logger.info(f"After word count filter (50–2000): {len(df)} songs (removed {before_wc - len(df)})")
 
+        # Step 5b — drop songs with missing/invalid year (prevents "0s" decade bucket)
+        before_year = len(df)
+        df["year"] = df["year"].apply(lambda y: int(y) if y and int(y) >= 1960 else 0)
+        df = df[df["year"] >= 1960].reset_index(drop=True)
+        logger.info(f"After year filter (>=1960): {len(df)} songs (removed {before_year - len(df)})")
+
         # Step 6 — add id and decade
         df["id"] = [str(uuid.uuid4()) for _ in range(len(df))]
         df["decade"] = df["year"].apply(self._year_to_decade)

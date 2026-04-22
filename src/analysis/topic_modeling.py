@@ -66,7 +66,9 @@ class TopicModeler:
 
         # Save embeddings computed during fit_transform
         try:
-            self._embeddings = self._model.embedding_model.encode(lyrics_list, show_progress_bar=True)
+            from sentence_transformers import SentenceTransformer
+            st_model = SentenceTransformer("all-MiniLM-L6-v2")
+            self._embeddings = st_model.encode(lyrics_list, show_progress_bar=True)
             np.save(str(_EMBEDDINGS_PATH), self._embeddings)
             logger.info(f"Embeddings saved to {_EMBEDDINGS_PATH}")
         except Exception as exc:

@@ -86,9 +86,12 @@ class DBManager:
         if self._demo:
             logger.info("DEMO_MODE: skipping insert_aspect_sentiments")
             return
+        # Strip columns that are not in the SQL schema (e.g. example_sentence)
+        allowed = {"song_id", "aspect", "sentiment", "score"}
+        stripped = [{k: v for k, v in row.items() if k in allowed} for row in aspects]
         try:
-            self._client.table("aspect_sentiments").upsert(aspects).execute()
-            logger.info(f"Upserted {len(aspects)} aspect_sentiment rows")
+            self._client.table("aspect_sentiments").upsert(stripped).execute()
+            logger.info(f"Upserted {len(stripped)} aspect_sentiment rows")
         except Exception as exc:
             logger.error(f"insert_aspect_sentiments failed: {exc}")
             raise

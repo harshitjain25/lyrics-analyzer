@@ -12,12 +12,21 @@ if db._demo:
     sys.exit(1)
 
 # Order matters: delete children before parents (FK constraints)
-tables = ["aspect_sentiments", "sentiments", "song_topics", "topics", "songs"]
-for t in tables:
+# Use appropriate filter per table — integer PK vs text PK
+plans = [
+    ("aspect_sentiments", "id",      "int"),
+    ("sentiments",        "song_id", "text"),
+    ("song_topics",       "id",      "int"),
+    ("topics",            "id",      "int"),
+    ("songs",             "id",      "text"),
+]
+for table, col, kind in plans:
     try:
-        db._client.table(t).delete().neq("id" if t != "sentiments" else "song_id", "__impossible__").execute()
-        logger.info(f"Wiped table: {t}")
+        q = db._client.table(table).delete()
+        q = q.gte(col, 0) if kind == "int" else q.neq(col, "__impossible__")
+        q.execute()
+        logger.info(f"Wiped table: {table}")
     except Exception as e:
-        logger.warning(f"Could not wipe {t}: {e}")
+        logger.warning(f"Could not wipe {table}: {e}")
 
 logger.info("All tables wiped. Safe to run run_collection.py fresh.")

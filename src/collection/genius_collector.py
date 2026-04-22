@@ -24,9 +24,9 @@ class GeniusCollector:
                 skip_non_songs=True,
                 excluded_terms=["(Remix)", "(Live)"],
                 remove_section_headers=False,
-                verbose=False,
                 timeout=10,
             )
+            self._genius.verbose = False
 
     # ── Public API ─────────────────────────────────────────────────────────────
 
@@ -102,9 +102,14 @@ class GeniusCollector:
                 hits = result.get("hits", []) if isinstance(result, dict) else []
                 songs = []
                 for h in hits:
-                    song_data = h.get("result", {})
-                    artist_name = song_data.get("primary_artist", {}).get("name", "")
+                    song_data = h.get("result") or {}
+                    pa = song_data.get("primary_artist") or {}
+                    artist_name = pa.get("name", "") if isinstance(pa, dict) else ""
                     title = song_data.get("title", "")
+                    rdc = song_data.get("release_date_components") or {}
+                    year = int(rdc.get("year") or 0) if isinstance(rdc, dict) else 0
+                    album_data = song_data.get("album") or {}
+                    album_name = album_data.get("name", "") if isinstance(album_data, dict) else ""
                     lyrics = self._fetch_lyrics(song_data.get("id"))
                     if not lyrics:
                         continue
@@ -113,9 +118,9 @@ class GeniusCollector:
                         "artist": artist_name,
                         "lyrics": lyrics,
                         "genre": query.split()[0],
-                        "year": int(song_data.get("release_date_components", {}).get("year") or 0),
+                        "year": year,
                         "decade": "",
-                        "album": song_data.get("album", {}).get("name", "") if song_data.get("album") else "",
+                        "album": album_name,
                         "genius_url": song_data.get("url", ""),
                     })
                 return songs

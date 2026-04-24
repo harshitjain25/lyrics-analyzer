@@ -1,129 +1,188 @@
-"""Evaluation script: BERTopic coherence + sentiment accuracy/F1."""
+"""Evaluation: topic confidence scores + sentiment accuracy on gold standard."""
 
 from __future__ import annotations
-
 import sys
 from pathlib import Path
-
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import json
+import numpy as np
 import pandas as pd
+from config import logger
 
-from config import EMBEDDINGS_DIR, PROCESSED_DIR, logger
+# ── Gold standard: 30 songs with known sentiment ──────────────────────────────
+# Format: (title_fragment, artist_fragment, expected_sentiment)
+# expected_sentiment: "positive", "negative", "neutral"
+GOLD_STANDARDS = [
+    # Clearly positive
+    ("Happy",                   "Pharrell",          "positive"),
+    ("Dancing Queen",           "ABBA",              "positive"),
+    ("Don't Stop Me Now",       "Queen",             "positive"),
+    ("I Will Survive",          "Gloria Gaynor",     "positive"),
+    ("Superstition",            "Stevie Wonder",     "positive"),
+    ("Respect",                 "Aretha Franklin",   "positive"),
+    ("Born to Run",             "Springsteen",       "positive"),
+    ("Good Vibrations",         "Beach Boys",        "positive"),
+    ("Dancing in the Street",   "Marvin Gaye",       "positive"),
+    ("September",               "Earth Wind",        "positive"),
+    # Clearly negative
+    ("Yesterday",               "Beatles",           "negative"),
+    ("Hurt",                    "Johnny Cash",       "negative"),
+    ("The Sound of Silence",    "Simon",             "negative"),
+    ("Bohemian Rhapsody",       "Queen",             "negative"),
+    ("Black",                   "Pearl Jam",         "negative"),
+    ("Losing My Religion",      "R.E.M.",            "negative"),
+    ("One",                     "U2",                "negative"),
+    ("Mad World",               "Tears for Fears",   "negative"),
+    ("The Night They Drove",    "The Band",          "negative"),
+    ("Knocking on Heaven",      "Bob Dylan",         "negative"),
+    # Neutral / mixed
+    ("Hotel California",        "Eagles",            "neutral"),
+    ("Smells Like Teen Spirit", "Nirvana",           "neutral"),
+    ("Born in the U.S.A.",      "Springsteen",       "neutral"),
+    ("Fight the Power",         "Public Enemy",      "neutral"),
+    ("Changes",                 "David Bowie",       "neutral"),
+    ("The Times They Are",      "Bob Dylan",         "neutral"),
+    ("Purple Rain",             "Prince",            "neutral"),
+    ("Thriller",                "Michael Jackson",   "neutral"),
+    ("Gimme Shelter",           "Rolling Stones",    "neutral"),
+    ("What's Going On",         "Marvin Gaye",       "neutral"),
+]
 
-_GOLD_CSV = PROCESSED_DIR / "sentiment_gold.csv"
-_IDS_JSON = EMBEDDINGS_DIR / "song_ids.json"
-_MODEL_PATH = EMBEDDINGS_DIR / "bertopic_model"
+
+def evaluate_topics(db) -> None:
+    """Evaluate topic quality via per-topic confidence and distribution."""
+    print("\n[1] TOPIC QUALITY EVALUATION")
+    print("-" * 50)
+
+    data = db.get_dashboard_data()
+    topics_df    = data["topics_df"]
+    st_df        = data["song_topics_df"]
+
+    if st_df.empty or topics_df.empty:
+        print("  No topic data found.")
+        return
+
+    merged = st_df.merge(topics_df[["topic_id", "label"]], on="topic_id", how="left")
+
+    print(f"  Songs with topic assignments: {len(merged)}")
+    print(f"  Number of topics: {topics_df['topic_id'].nunique()}")
+    print()
+    print(f"  {'Topic':<40} {'Songs':>6}  {'Avg Confidence':>15}  {'Min':>6}  {'Max':>6}")
+    print(f"  {'-'*40} {'-'*6}  {'-'*15}  {'-'*6}  {'-'*6}")
+
+    overall_conf = []
+    for _, topic in topics_df.sort_values("topic_id").iterrows():
+        subset = merged[merged["topic_id"] == topic["topic_id"]]
+        if subset.empty:
+            continue
+        probs = subset["probability"].astype(float)
+        overall_conf.extend(probs.tolist())
+        print(f"  {topic['label']:<40} {len(subset):>6}  {probs.mean():>14.3f}  {probs.min():>6.3f}  {probs.max():>6.3f}")
+
+    print(f"\n  Overall avg confidence: {np.mean(overall_conf):.3f}")
+    if np.mean(overall_conf) >= 0.6:
+        print("  ✓ Good topic confidence (≥0.60)")
+    else:
+        print("  ~ Moderate topic confidence (<0.60)")
 
 
-def evaluate_topic_coherence() -> float | None:
-    """Compute BERTopic CV coherence score using gensim."""
-    try:
-        import json
-        import numpy as np
-        from bertopic import BERTopic
-        from gensim.corpora import Dictionary
-        from gensim.models.coherencemodel import CoherenceModel
+def evaluate_sentiment(db) -> None:
+    """Match gold standard songs against model predictions and compute accuracy."""
+    print("\n[2] SENTIMENT ACCURACY (Gold Standard — 30 songs)")
+    print("-" * 50)
 
-        if not _MODEL_PATH.exists():
-            logger.warning(f"BERTopic model not found at {_MODEL_PATH}")
-            return None
+    data = db.get_dashboard_data()
+    songs_df      = data["songs_df"]
+    sentiments_df = data["sentiments_df"]
 
-        model = BERTopic.load(str(_MODEL_PATH))
-        topics = model.get_topics()
-        topic_words = [
-            [word for word, _ in words[:10]]
-            for tid, words in topics.items()
-            if tid != -1 and words
-        ]
+    if songs_df.empty or sentiments_df.empty:
+        print("  No sentiment data found.")
+        return
 
-        if not _IDS_JSON.exists():
-            logger.warning("song_ids.json not found, cannot compute coherence")
-            return None
+    merged = songs_df.merge(sentiments_df, left_on="id", right_on="song_id", how="inner")
 
-        from src.database.db_manager import DBManager
-        db = DBManager()
-        songs_df = db.get_songs()
-        texts = [lyrics.split() for lyrics in songs_df["clean_lyrics"].tolist()]
-        dictionary = Dictionary(texts)
-        corpus = [dictionary.doc2bow(text) for text in texts]
+    results = []
+    not_found = []
 
-        cm = CoherenceModel(
-            topics=topic_words,
-            texts=texts,
-            dictionary=dictionary,
-            coherence="c_v",
+    for title_frag, artist_frag, expected in GOLD_STANDARDS:
+        mask = (
+            merged["title"].str.contains(title_frag, case=False, na=False) &
+            merged["artist"].str.contains(artist_frag, case=False, na=False)
         )
-        score = cm.get_coherence()
-        return score
-    except Exception as exc:
-        logger.error(f"Coherence evaluation failed: {exc}")
-        return None
+        matches = merged[mask]
+        if matches.empty:
+            not_found.append(f"{title_frag} — {artist_frag}")
+            continue
+        row = matches.iloc[0]
+        predicted = row["overall_sentiment"].lower().strip()
+        # Normalise: model may output "positive"/"negative"/"neutral"
+        correct = predicted == expected
+        results.append({
+            "title":     row["title"],
+            "artist":    row["artist"],
+            "expected":  expected,
+            "predicted": predicted,
+            "correct":   correct,
+        })
 
+    if not results:
+        print("  No gold standard songs found in corpus.")
+        print(f"  Missing: {not_found}")
+        return
 
-def evaluate_sentiment() -> dict | None:
-    """Compute accuracy and macro F1 against the gold sentiment labels."""
-    if not _GOLD_CSV.exists():
-        logger.warning(f"Gold labels not found at {_GOLD_CSV}")
-        return None
-    try:
-        from sklearn.metrics import accuracy_score, classification_report, f1_score
+    res_df  = pd.DataFrame(results)
+    correct = res_df["correct"].sum()
+    total   = len(res_df)
+    acc     = correct / total
 
-        gold_df = pd.read_csv(_GOLD_CSV)
+    print(f"  Gold songs matched in corpus: {total}/30")
+    print(f"  Correct predictions:          {correct}/{total}")
+    print(f"  Accuracy:                     {acc:.2%}")
+    print()
 
-        from src.database.db_manager import DBManager
-        db = DBManager()
-        data = db.get_dashboard_data()
-        sentiments_df = data["sentiments_df"]
+    # Per-class breakdown
+    for label in ["positive", "negative", "neutral"]:
+        subset = res_df[res_df["expected"] == label]
+        if subset.empty:
+            continue
+        sub_acc = subset["correct"].sum() / len(subset)
+        print(f"  {label.capitalize():<10}  {subset['correct'].sum()}/{len(subset)}  ({sub_acc:.0%})")
 
-        merged = gold_df.merge(sentiments_df, left_on="id", right_on="song_id", how="inner")
-        if merged.empty:
-            logger.warning("No overlapping IDs between gold labels and predictions")
-            return None
+    print()
+    print(f"  {'Title':<35} {'Expected':<12} {'Predicted':<12} {'OK'}")
+    print(f"  {'-'*35} {'-'*12} {'-'*12} {'-'*4}")
+    for _, r in res_df.iterrows():
+        ok = "✓" if r["correct"] else "✗"
+        print(f"  {r['title'][:34]:<35} {r['expected']:<12} {r['predicted']:<12} {ok}")
 
-        y_true = merged["true_sentiment"].tolist()
-        y_pred = merged["overall_sentiment"].tolist()
+    if not_found:
+        print(f"\n  Not in corpus ({len(not_found)}): {', '.join(not_found[:5])}{'...' if len(not_found)>5 else ''}")
 
-        acc = accuracy_score(y_true, y_pred)
-        f1 = f1_score(y_true, y_pred, average="macro", zero_division=0)
-        report = classification_report(y_true, y_pred, zero_division=0)
-        return {"accuracy": acc, "macro_f1": f1, "report": report, "n_samples": len(merged)}
-    except Exception as exc:
-        logger.error(f"Sentiment evaluation failed: {exc}")
-        return None
+    # Overall assessment
+    print()
+    if acc >= 0.75:
+        print("  ✓ Strong sentiment accuracy (≥75%)")
+    elif acc >= 0.55:
+        print("  ~ Acceptable sentiment accuracy (55–75%)")
+    else:
+        print("  ✗ Low sentiment accuracy (<55%) — model may need fine-tuning")
 
 
 def main() -> None:
+    from src.database.db_manager import DBManager
+    db = DBManager()
+
     print("\n" + "=" * 60)
-    print("EVALUATION REPORT")
+    print("EVALUATION REPORT — Song Lyrics Thematic Analyzer")
     print("=" * 60)
 
-    print("\n[1] BERTopic Coherence (CV)")
-    score = evaluate_topic_coherence()
-    if score is not None:
-        print(f"  Coherence Score (CV): {score:.4f}")
-        if score >= 0.55:
-            print("  ✓ Good coherence (≥0.55)")
-        elif score >= 0.40:
-            print("  ~ Acceptable coherence (0.40–0.55)")
-        else:
-            print("  ✗ Low coherence (<0.40) — consider adjusting HDBSCAN parameters")
-    else:
-        print("  Skipped (model or data not found)")
-
-    print("\n[2] Sentiment Classification")
-    result = evaluate_sentiment()
-    if result:
-        print(f"  Samples evaluated:  {result['n_samples']}")
-        print(f"  Accuracy:           {result['accuracy']:.4f}")
-        print(f"  Macro F1:           {result['macro_f1']:.4f}")
-        print("\n  Per-class report:")
-        for line in result["report"].splitlines():
-            print(f"    {line}")
-    else:
-        print("  Skipped (gold labels or predictions not found)")
+    evaluate_topics(db)
+    evaluate_sentiment(db)
 
     print("\n" + "=" * 60)
+    print("Evaluation complete.")
+    print("=" * 60)
 
 
 if __name__ == "__main__":

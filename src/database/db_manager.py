@@ -103,27 +103,47 @@ class DBManager:
         if self._demo:
             return self._load_sample(genre=genre, decade=decade)
         try:
-            q = self._client.table("songs").select("*")
-            if genre:
-                q = q.eq("genre", genre)
-            if decade:
-                q = q.eq("decade", decade)
-            result = q.execute()
-            return pd.DataFrame(result.data)
+            all_rows = []
+            page_size = 1000
+            offset = 0
+            while True:
+                q = self._client.table("songs").select("*").range(offset, offset + page_size - 1)
+                if genre:
+                    q = q.eq("genre", genre)
+                if decade:
+                    q = q.eq("decade", decade)
+                result = q.execute()
+                batch = result.data or []
+                all_rows.extend(batch)
+                if len(batch) < page_size:
+                    break
+                offset += page_size
+            return pd.DataFrame(all_rows)
         except Exception as exc:
             logger.error(f"get_songs failed: {exc}")
             raise
+
+    def _fetch_all(self, table: str) -> list:
+        """Fetch all rows from a table using pagination (bypasses 1000-row limit)."""
+        all_rows, offset, page_size = [], 0, 1000
+        while True:
+            batch = self._client.table(table).select("*").range(offset, offset + page_size - 1).execute().data or []
+            all_rows.extend(batch)
+            if len(batch) < page_size:
+                break
+            offset += page_size
+        return all_rows
 
     def get_dashboard_data(self) -> dict[str, pd.DataFrame]:
         """Return all tables needed by the dashboard as a dict of DataFrames."""
         if self._demo:
             return self._demo_dashboard_data()
         try:
-            songs_df = pd.DataFrame(self._client.table("songs").select("*").execute().data)
-            topics_df = pd.DataFrame(self._client.table("topics").select("*").execute().data)
-            song_topics_df = pd.DataFrame(self._client.table("song_topics").select("*").execute().data)
-            sentiments_df = pd.DataFrame(self._client.table("sentiments").select("*").execute().data)
-            aspects_df = pd.DataFrame(self._client.table("aspect_sentiments").select("*").execute().data)
+            songs_df = pd.DataFrame(self._fetch_all("songs"))
+            topics_df = pd.DataFrame(self._fetch_all("topics"))
+            song_topics_df = pd.DataFrame(self._fetch_all("song_topics"))
+            sentiments_df = pd.DataFrame(self._fetch_all("sentiments"))
+            aspects_df = pd.DataFrame(self._fetch_all("aspect_sentiments"))
             return {
                 "songs_df": songs_df,
                 "topics_df": topics_df,

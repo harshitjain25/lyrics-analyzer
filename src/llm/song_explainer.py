@@ -28,13 +28,14 @@ What sets this song apart is the writer's command of compression — the ability
 class SongExplainer:
     """Streams a 4-paragraph song analysis from Groq."""
 
-    def __init__(self) -> None:
+    def __init__(self, api_key: str | None = None) -> None:
         """Initialise Groq client (skipped in MOCK_MODE)."""
         self._client = None
         if not MOCK_MODE:
+            key = api_key or GROQ_API_KEY
             try:
                 import groq
-                self._client = groq.Groq(api_key=GROQ_API_KEY)
+                self._client = groq.Groq(api_key=key)
                 logger.info("Groq client initialised for song explanation")
             except Exception as exc:
                 logger.error(f"Failed to initialise Groq client: {exc}")

@@ -100,13 +100,16 @@ with right:
     with st.expander("📜 Lyrics", expanded=False):
         st.text(lyrics)
 
-    # Read GROQ key — config may be imported before st.secrets loads, so check here too
-    _groq_key = GROQ_API_KEY or st.secrets.get("GROQ_API_KEY", "")
+    # Read GROQ key at runtime — config.py may be imported before st.secrets is ready
+    try:
+        _groq_key = GROQ_API_KEY or st.secrets.get("GROQ_API_KEY", "")
+    except Exception:
+        _groq_key = GROQ_API_KEY
     if not _groq_key and not MOCK_MODE:
         st.info("Add GROQ_API_KEY to your .env file to enable AI explanations.")
     else:
         if st.button("✨ Explain This Song", type="primary"):
-            explainer = SongExplainer()
+            explainer = SongExplainer(api_key=_groq_key or None)
             with st.spinner("Generating analysis…"):
                 stream = explainer.explain(
                     title=row["title"],

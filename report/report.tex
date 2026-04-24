@@ -17,6 +17,7 @@
 \usepackage{microtype}
 \usepackage{natbib}
 \usepackage{url}
+\usepackage{seqsplit}
 \usepackage{titlesec}
 \usepackage{fancyhdr}
 \usepackage{multirow}
@@ -164,7 +165,7 @@ The dominance of the 2010s (1,015 songs, 33.6\%) reflects the larger digital cat
 \subsubsection{Topic Modelling}
 \label{sec:topics}
 
-We experimented with BERTopic \citep{grootendorst2022bertopic} using HDBSCAN clustering (\texttt{min\_cluster\_size=30}) on sentence-transformer embeddings (\texttt{all-MiniLM-L6-v2}) \citep{reimers2019sentence}. BERTopic discovered only 4 topics due to the high cluster size threshold required to avoid noise; the majority of songs (approximately 90\%) were assigned to a single ``Personal Relationships'' cluster.
+We experimented with BERTopic \citep{grootendorst2022bertopic} using HDBSCAN clustering (min\_cluster\_size\,=\,30) on sentence-transformer embeddings (\texttt{all-MiniLM-L6-v2}) \citep{reimers2019sentence}. BERTopic discovered only 4 topics due to the high cluster size threshold required to avoid noise; the majority of songs (approximately 90\%) were assigned to a single ``Personal Relationships'' cluster.
 
 To address this, we adopted a \textbf{semantic similarity-based topic assignment} method. Eight thematically meaningful topic labels were defined by the team based on lyrical domain knowledge:
 
@@ -183,11 +184,11 @@ Each label was augmented with eight representative keywords and encoded with \te
 
 \subsubsection{Sentiment Analysis}
 
-Overall sentiment (positive / neutral / negative) was computed using \texttt{cardiffnlp/twitter-roberta-base-sentiment-latest} \citep{barbieri2020tweeteval}, a RoBERTa model \citep{liu2019roberta} fine-tuned on 124 million tweets as part of the TweetEval benchmark. Each song's \texttt{clean\_lyrics} field (truncated to 512 tokens) was passed as input. The model outputs a probability distribution over three classes; the argmax was taken as the predicted label, and the associated probability as the sentiment score.
+Overall sentiment (positive / neutral / negative) was computed using \path{cardiffnlp/twitter-roberta-base-sentiment-latest} \citep{barbieri2020tweeteval}, a RoBERTa model \citep{liu2019roberta} fine-tuned on 124 million tweets as part of the TweetEval benchmark. Each song's \texttt{clean\_lyrics} field (truncated to 512 tokens) was passed as input. The model outputs a probability distribution over three classes; the argmax was taken as the predicted label, and the associated probability as the sentiment score.
 
 \subsubsection{Emotion Classification}
 
-Per-song emotion scores were computed using \texttt{j-hartmann/emotion-english-distilroberta-base}, a DistilRoBERTa model fine-tuned on emotion-labelled data \citep{demszky2020goemotions}, producing a probability distribution over seven Ekman-inspired emotion categories: joy, sadness, anger, fear, surprise, disgust, and neutral.
+Per-song emotion scores were computed using \path{j-hartmann/emotion-english-distilroberta-base}, a DistilRoBERTa model fine-tuned on emotion-labelled data \citep{demszky2020goemotions}, producing a probability distribution over seven Ekman-inspired emotion categories: joy, sadness, anger, fear, surprise, disgust, and neutral.
 
 \subsubsection{Aspect-Based Sentiment Analysis}
 \label{sec:aspect}
@@ -283,18 +284,20 @@ Table~\ref{tab:emotion} reports corpus-wide average emotion scores and genre-lev
 \centering
 \caption{Average emotion scores across the full corpus and by selected genres.}
 \label{tab:emotion}
-\begin{tabular}{lrrrrrrr}
+\small
+\begin{tabular}{lccccccc}
 \toprule
 \textbf{Scope} & \textbf{Joy} & \textbf{Sadness} & \textbf{Anger} & \textbf{Fear} & \textbf{Surprise} & \textbf{Disgust} & \textbf{Neutral} \\
 \midrule
 All genres & 0.105 & 0.204 & 0.151 & 0.159 & 0.098 & 0.061 & 0.223 \\
 \midrule
-Hip-Hop    & 0.059 & -- & \textbf{0.297} & -- & -- & -- & -- \\
-R\&B       & \textbf{0.164} & -- & 0.123 & -- & -- & -- & -- \\
-Country    & 0.113 & -- & 0.102 & -- & -- & -- & -- \\
-Rock       & 0.082 & -- & 0.125 & -- & -- & -- & -- \\
+Hip-Hop    & 0.059 & $-$ & \textbf{0.297} & $-$ & $-$ & $-$ & $-$ \\
+R\&B       & \textbf{0.164} & $-$ & 0.123 & $-$ & $-$ & $-$ & $-$ \\
+Country    & 0.113 & $-$ & 0.102 & $-$ & $-$ & $-$ & $-$ \\
+Rock       & 0.082 & $-$ & 0.125 & $-$ & $-$ & $-$ & $-$ \\
 \bottomrule
 \end{tabular}
+\normalsize
 \end{table}
 
 Hip-hop exhibits the highest anger score (0.297), nearly twice the corpus average (0.151), \textbf{supporting H1}. R\&B shows the highest joy (0.164), consistent with its sentiment ranking. Neutral is the most frequent label corpus-wide (0.223), reflecting the prevalence of storytelling and descriptive lyrics that do not strongly express a single emotion.
@@ -307,7 +310,7 @@ Table~\ref{tab:absa} shows the distribution of aspect-sentiment pairs across the
 \centering
 \caption{Aspect-based sentiment analysis: aspect distribution and sentiment breakdown.}
 \label{tab:absa}
-\begin{tabular}{lrrrr}
+\begin{tabular}{p{5.5cm}rrrr}
 \toprule
 \textbf{Aspect} & \textbf{Records} & \textbf{Positive} & \textbf{Neutral} & \textbf{Negative} \\
 \midrule
@@ -399,19 +402,19 @@ The interactive dashboard (\url{https://lyrics-analyzer-jpsnn8dlcivnnmyrfetng8.s
 \begin{table}[H]
 \centering
 \caption{Team member contributions.}
-\begin{tabular}{ll}
+\begin{tabular}{p{4cm}p{9cm}}
 \toprule
 \textbf{Team Member} & \textbf{Primary Contribution} \\
 \midrule
-Harshit Jain         & Data collection, API integration, preprocessing pipeline, database \\
+Harshit Jain         & Data collection, API integration, preprocessing pipeline, database organisation \\
 Geethan Thallam      & Topic modelling, LLM-assisted theme labelling \\
-Parsh Jadon          & Sentiment and emotion analysis, ABSA, evaluation \\
+Parsh Jadon          & Sentiment and emotion analysis, aspect-based sentiment analysis, evaluation \\
 Irfan Ahmed Mohammed & Dashboard development, visualisations, song explainer integration \\
+\midrule
+\multicolumn{2}{l}{\small\textit{All team members contributed to integration, testing, and report writing.}} \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-Integration, testing, and report writing were primarily carried out by Harshit Jain, with inputs from team members in their respective modules.
 
 % ── 9. Conclusion ─────────────────────────────────────────────────────────────
 \section{Conclusion}

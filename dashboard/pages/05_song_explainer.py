@@ -100,7 +100,9 @@ with right:
     with st.expander("📜 Lyrics", expanded=False):
         st.text(lyrics)
 
-    if not GROQ_API_KEY and not MOCK_MODE:
+    # Read GROQ key — config may be imported before st.secrets loads, so check here too
+    _groq_key = GROQ_API_KEY or st.secrets.get("GROQ_API_KEY", "")
+    if not _groq_key and not MOCK_MODE:
         st.info("Add GROQ_API_KEY to your .env file to enable AI explanations.")
     else:
         if st.button("✨ Explain This Song", type="primary"):

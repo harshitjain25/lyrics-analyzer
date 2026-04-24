@@ -11,5 +11,6 @@ scipy
 scikit-learn
 sentence-transformers
 torch --index-url https://download.pytorch.org/whl/cpu
+torchvision --index-url https://download.pytorch.org/whl/cpu
 huggingface-hub
 tqdm

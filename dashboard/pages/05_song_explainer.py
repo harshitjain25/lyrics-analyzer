@@ -101,12 +101,14 @@ with right:
         st.text(lyrics)
 
     # Read GROQ key at runtime — config.py may be imported before st.secrets is ready
-    try:
-        _groq_key = GROQ_API_KEY or st.secrets.get("GROQ_API_KEY", "")
-    except Exception:
-        _groq_key = GROQ_API_KEY
+    _groq_key = GROQ_API_KEY
+    if not _groq_key:
+        try:
+            _groq_key = st.secrets["GROQ_API_KEY"]
+        except Exception:
+            pass
     if not _groq_key and not MOCK_MODE:
-        st.info("Add GROQ_API_KEY to your .env file to enable AI explanations.")
+        st.warning("GROQ_API_KEY not found. Add it in Streamlit Cloud → App settings → Secrets.")
     else:
         if st.button("✨ Explain This Song", type="primary"):
             explainer = SongExplainer(api_key=_groq_key or None)

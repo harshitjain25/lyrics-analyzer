@@ -58,16 +58,16 @@ class AspectSentimentAnalyzer:
             for sent, pred in zip(sentences, predictions):
                 top_label = pred["labels"][0]
                 top_score = pred["scores"][0]
-                if top_score >= 0.4:
+                if top_score >= 0.25:
                     aspect_groups[top_label].append(sent)
         except Exception as exc:
             logger.warning(f"Zero-shot classification failed: {exc}")
             return []
 
-        # Run sentiment on groups with ≥3 sentences
+        # Run sentiment on groups with ≥1 sentence
         results = []
         for aspect, sents in aspect_groups.items():
-            if len(sents) < 3:
+            if len(sents) < 1:
                 continue
             combined = " ".join(sents[:10])
             try:

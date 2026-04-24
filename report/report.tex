@@ -2,7 +2,6 @@
 
 % ── Packages ──────────────────────────────────────────────────────────────────
 \usepackage[margin=2.5cm]{geometry}
-\graphicspath{{../results/}}
 \usepackage{times}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -224,20 +223,9 @@ The full pipeline is reproducible from the public GitHub repository. Collection 
 % ── 5. Results ────────────────────────────────────────────────────────────────
 \section{Results}
 
-\subsection{Dashboard Overview}
-
-Figure~\ref{fig:home} shows the deployed dashboard home page, confirming the corpus statistics: 3,020 songs, 6 genres, 7 decades, and 8 topics.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.95\textwidth]{01_home.png}
-\caption{Dashboard home page showing corpus overview, songs per decade, and songs per genre.}
-\label{fig:home}
-\end{figure}
-
 \subsection{Topic Distribution}
 
-Table~\ref{tab:topics} shows the distribution of songs across the eight discovered topics. Figure~\ref{fig:themes} illustrates the theme distribution by decade and the genre $\times$ theme heatmap. Heartbreak and Loss is the dominant theme (46.9\%), consistent with prior computational analysis showing that song lyrics are predominantly concerned with romantic themes \citep{fell2014lyrics}. Love and Romance accounts for a further 24.5\%, together suggesting that approximately 71\% of popular song lyrics centre on romantic experience. Social Issues and Protest (1.5\%) and Faith and Spirituality (1.1\%) are the least represented themes.
+Table~\ref{tab:topics} shows the distribution of songs across the eight discovered topics. Heartbreak and Loss is the dominant theme (46.9\%), consistent with prior computational analysis showing that song lyrics are predominantly concerned with romantic themes \citep{fell2014lyrics}. Love and Romance accounts for a further 24.5\%, together suggesting that approximately 71\% of popular song lyrics centre on romantic experience. Social Issues and Protest (1.5\%) and Faith and Spirituality (1.1\%) are the least represented themes.
 
 \begin{table}[H]
 \centering
@@ -263,13 +251,6 @@ Faith and Spirituality        &    32 &  1.1\% \\
 
 The average topic assignment confidence score was \textbf{0.305} (moderate), reflecting the inherent thematic ambiguity of song lyrics, where a single song often addresses multiple themes simultaneously.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.95\textwidth]{02_theme_explorer.png}
-\caption{Theme Explorer: (left) stacked bar chart showing theme distribution across decades; (right) genre $\times$ theme heatmap with topic keywords.}
-\label{fig:themes}
-\end{figure}
-
 \subsection{Sentiment Analysis Results}
 
 The overall corpus sentiment distribution was: neutral 38.7\%, positive 35.3\%, negative 26.0\%. Table~\ref{tab:sentiment} reports average sentiment scores by genre (higher = more positive).
@@ -294,13 +275,6 @@ Rock       & 0.640 & 6 (least positive) \\
 
 These results \textbf{partially support H2}: electronic music showed a marked decline from a high of 0.89 in the 1960s (driven by early synth-pop artists) to approximately 0.66 in later decades. R\&B peaked in the 1980s (0.75). Rock remained consistently the least positive genre throughout all decades, consistent with its association with angst and social critique.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.95\textwidth]{03_sentiment_trends.png}
-\caption{Average sentiment score by genre across decades (1960s--2020s). Electronic music shows the steepest decline; R\&B is consistently the most positive genre.}
-\label{fig:sentiment}
-\end{figure}
-
 \subsection{Emotion Classification Results}
 
 Table~\ref{tab:emotion} reports corpus-wide average emotion scores and genre-level averages for the two most discriminative emotions.
@@ -324,23 +298,6 @@ Rock       & 0.082 & -- & 0.125 & -- & -- & -- & -- \\
 \end{table}
 
 Hip-hop exhibits the highest anger score (0.297), nearly twice the corpus average (0.151), \textbf{supporting H1}. R\&B shows the highest joy (0.164), consistent with its sentiment ranking. Neutral is the most frequent label corpus-wide (0.223), reflecting the prevalence of storytelling and descriptive lyrics that do not strongly express a single emotion.
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=\textwidth]{04_genre_comparison.png}
-    \caption{Genres ranked by sentiment (left) and emotion profile heatmap by genre (right).}
-    \label{fig:genre_comparison}
-\end{subfigure}
-\hfill
-\begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=\textwidth]{05_emotion_radar.png}
-    \caption{Emotion radar comparing pop vs.\ rock, and emotion mix over decades.}
-    \label{fig:emotion_radar}
-\end{subfigure}
-\caption{Genre Comparison page: sentiment and emotion profiles across genres and decades.}
-\label{fig:genre_emotion}
-\end{figure}
 
 \subsection{Aspect-Based Sentiment Results}
 
@@ -371,23 +328,6 @@ Social issues and politics   &    32 & 19\% & 34\% & 47\% \\
 These results \textbf{support H3}: songs that receive an overall ``positive'' sentiment label may simultaneously express negativity in specific aspects. For example, a song classified as positive overall may express negative sentiment towards ``loss and grief'' while expressing positive sentiment towards ``celebration and party.'' This richer representation is not captured by a single document-level label.
 
 Social issues and politics shows the highest negative rate (47\%), consistent with the protest function of politically engaged music. Celebration and party shows the highest positive rate (41\%), as expected.
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=\textwidth]{06_song_search.png}
-    \caption{Semantic Song Search: top-10 results for the query \textit{``romance''}.}
-    \label{fig:search}
-\end{subfigure}
-\hfill
-\begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=\textwidth]{07_song_explainer.png}
-    \caption{AI Song Explainer: emotion scores and LLM-generated analysis for \textit{FEIN} by Travis Scott.}
-    \label{fig:explainer}
-\end{subfigure}
-\caption{Interactive features: semantic search and LLM-assisted song explanation.}
-\label{fig:interactive}
-\end{figure}
 
 \subsection{Evaluation Results}
 
@@ -471,7 +411,7 @@ Irfan Ahmed Mohammed & Dashboard development, visualisations, song explainer int
 \end{tabular}
 \end{table}
 
-All team members contributed to integration, testing, and report writing.
+Integration, testing, and report writing were primarily carried out by Harshit Jain, with inputs from team members in their respective modules.
 
 % ── 9. Conclusion ─────────────────────────────────────────────────────────────
 \section{Conclusion}

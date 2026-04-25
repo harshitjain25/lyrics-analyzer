@@ -1,73 +1,39 @@
-\documentclass[12pt, a4paper]{article}
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
 
-% ── Packages ──────────────────────────────────────────────────────────────────
-\usepackage[margin=2.5cm]{geometry}
-\usepackage{times}
 \usepackage{graphicx}
-\usepackage{booktabs}
-\usepackage{array}
-\usepackage{amsmath}
-\usepackage{hyperref}
-\usepackage{xcolor}
-\usepackage{enumitem}
-\usepackage{caption}
-\usepackage{subcaption}
-\usepackage{float}
-\usepackage{parskip}
-\usepackage{microtype}
-\usepackage{natbib}
-\usepackage{url}
-\usepackage{seqsplit}
-\usepackage{titlesec}
-\usepackage{fancyhdr}
 \usepackage{multirow}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{array}
 
-\hypersetup{
-    colorlinks=true,
-    linkcolor=black,
-    citecolor=black,
-    urlcolor=blue
-}
+% Allow line breaks in \path{} for long model names
+\makeatletter
+\g@addto@macro\UrlBreaks{\do\/\do-}
+\makeatother
 
-\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
-\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
-\titleformat{\subsubsection}{\normalsize\itshape}{\thesubsubsection}{1em}{}
-
-\pagestyle{fancy}
-\fancyhf{}
-\rhead{\small Song Lyrics Thematic Analyzer}
-\lhead{\small NLP Course Project}
-\cfoot{\thepage}
-
-% ── Title ─────────────────────────────────────────────────────────────────────
 \begin{document}
 
-\begin{titlepage}
-\centering
-\vspace*{2cm}
-{\LARGE\bfseries Song Lyrics Thematic Analyzer:\\[0.4em]
-Tracking Themes and Sentiment in Music Over Time\par}
-\vspace{1.5cm}
-{\large
-Harshit Jain \quad Parsh Jadon \quad Geethan Thallam \quad Irfan Ahmed Mohammed\par}
-\vspace{0.5cm}
-{\normalsize NLP Course Project\par}
-\vspace{0.5cm}
-{\normalsize April 2026\par}
-\vspace{2cm}
+\title[Song Lyrics Thematic Analyzer]{Song Lyrics Thematic Analyzer: Tracking Themes and Sentiment in Music Over Time}
 
-\begin{abstract}
-\noindent
-This paper presents the Song Lyrics Thematic Analyzer, a system for large-scale computational analysis of popular song lyrics across six decades (1960s--2020s) and six major genres. We collected 3,020 English-language songs using the Genius API and applied a multi-model NLP pipeline comprising sentiment analysis with RoBERTa, emotion classification with DistilRoBERTa, and aspect-based sentiment analysis with BART zero-shot inference. Topics were discovered using a semantic similarity approach anchored on eight predefined thematic labels, leveraging sentence-transformer embeddings. Key findings include that R\&B is the most positive genre by sentiment score (0.696), hip-hop exhibits the highest average anger (0.297), and heartbreak/loss is the dominant lyrical theme across all genres and decades (46.9\% of songs). An interactive Streamlit dashboard provides live exploration of all results, including a Groq LLM-assisted song explainer and semantic search over the full corpus.
-\end{abstract}
+\author*[1]{\fnm{Harshit} \sur{Jain}}\email{harshit2508baj@gmail.com}
+\author[1]{\fnm{Parsh} \sur{Jadon}}
+\author[1]{\fnm{Geethan} \sur{Thallam}}
+\author[1]{\fnm{Irfan Ahmed} \sur{Mohammed}}
 
-\vspace{1cm}
-\textbf{Live Dashboard:} \url{https://lyrics-analyzer-jpsnn8dlcivnnmyrfetng8.streamlit.app/}\\[0.3em]
-\textbf{Source Code:} \url{https://github.com/harshitjain25/lyrics-analyzer}
-\end{titlepage}
+\affil*[1]{\orgname{NLP Course Project}, \orgaddress{\city{Atlanta}, \state{Georgia}, \country{USA}}}
+
+\abstract{This paper presents the Song Lyrics Thematic Analyzer, a system for large-scale computational analysis of popular song lyrics across six decades (1960s--2020s) and six major genres. We collected 3,020 English-language songs using the Genius API and applied a multi-model NLP pipeline comprising sentiment analysis with RoBERTa, emotion classification with DistilRoBERTa, and aspect-based sentiment analysis with BART zero-shot inference. Topics were discovered using a semantic similarity approach anchored on eight predefined thematic labels, leveraging sentence-transformer embeddings. Key findings include that R\&B is the most positive genre by sentiment score (0.696), hip-hop exhibits the highest average anger (0.297), and heartbreak/loss is the dominant lyrical theme across all genres and decades (46.9\% of songs). An interactive Streamlit dashboard provides live exploration of all results, including a Groq LLM-assisted song explainer and semantic search over the full corpus. The live dashboard is available at \url{https://lyrics-analyzer-jpsnn8dlcivnnmyrfetng8.streamlit.app/} and source code at \url{https://github.com/harshitjain25/lyrics-analyzer}.}
+
+\keywords{Song lyrics, Sentiment analysis, Topic modelling, Aspect-based sentiment analysis, BERTopic, Transformer models, Music analytics}
+
+\maketitle
 
 % ── 1. Introduction ───────────────────────────────────────────────────────────
-\section{Introduction}
+\section{Introduction}\label{sec1}
 
 Song lyrics serve as a rich, culturally embedded text collection that reflects the values, emotions, and social concerns of their time. Across six decades of popular music, lyrical content has evolved in response to social movements, technological changes, and shifting cultural norms. Yet the systematic analysis of these patterns at scale remains challenging without computational support.
 
@@ -76,16 +42,16 @@ This project builds a complete end-to-end system for thematic and sentiment anal
 We collect approximately 3,000 songs spanning the 1960s through 2020s across six major genres --- pop, rock, hip-hop, country, R\&B, and electronic --- and apply a suite of transformer-based NLP models. Results are made accessible through an interactive Streamlit dashboard with semantic song search and LLM-assisted explanation.
 
 % ── 2. Related Work ───────────────────────────────────────────────────────────
-\section{Related Work}
+\section{Related Work}\label{sec2}
 
-Computational analysis of song lyrics has been explored from multiple angles. \citet{fell2014lyrics} analysed lyrics as a literary form and demonstrated that lyrics exhibit lower vocabulary richness than prose but distinctive repetition patterns. The transformer architecture introduced by \citet{vaswani2017attention} and subsequently operationalised through BERT \citep{devlin2019bert} underpins all NLP models used in this work.
+Computational analysis of song lyrics has been explored from multiple angles. Fell and Sporleder~\cite{fell2014lyrics} analysed lyrics as a literary form and demonstrated that lyrics exhibit lower vocabulary richness than prose but distinctive repetition patterns. The transformer architecture introduced by Vaswani et al.~\cite{vaswani2017attention} and subsequently operationalised through BERT~\cite{devlin2019bert} underpins all NLP models used in this work.
 
-BERTopic \citep{grootendorst2022bertopic} extends classical topic modelling by combining sentence-transformer embeddings \citep{reimers2019sentence} with HDBSCAN clustering, yielding coherent topics without requiring a fixed number of clusters. Sentiment analysis using fine-tuned transformer models such as RoBERTa \citep{liu2019roberta}, evaluated on the TweetEval benchmark \citep{barbieri2020tweeteval}, achieves strong performance on social media text, though transfer to song lyrics introduces domain mismatch. Aspect-based sentiment analysis provides a richer account of opinion expression; zero-shot classification with BART \citep{lewis2020bart} offers an effective approach to ABSA without aspect-specific training data, as demonstrated by \citet{yin2019zeroshot}. Fine-grained emotion classification builds on datasets such as GoEmotions \citep{demszky2020goemotions}. Our work combines these techniques within a unified analysis pipeline.
+BERTopic~\cite{grootendorst2022bertopic} extends classical topic modelling by combining sentence-transformer embeddings~\cite{reimers2019sentence} with HDBSCAN clustering, yielding coherent topics without requiring a fixed number of clusters. Sentiment analysis using fine-tuned transformer models such as RoBERTa~\cite{liu2019roberta}, evaluated on the TweetEval benchmark~\cite{barbieri2020tweeteval}, achieves strong performance on social media text, though transfer to song lyrics introduces domain mismatch. Aspect-based sentiment analysis provides a richer account of opinion expression; zero-shot classification with BART~\cite{lewis2020bart} offers an effective approach to ABSA without aspect-specific training data, as demonstrated by Yin et al.~\cite{yin2019zeroshot}. Fine-grained emotion classification builds on datasets such as GoEmotions~\cite{demszky2020goemotions}. Our work combines these techniques within a unified analysis pipeline.
 
 % ── 3. Dataset and Preprocessing ─────────────────────────────────────────────
-\section{Dataset and Preprocessing}
+\section{Dataset and Preprocessing}\label{sec3}
 
-\subsection{Data Collection}
+\subsection{Data Collection}\label{subsec1}
 
 Songs were collected using the Genius API via the \texttt{lyricsgenius} Python library. Two complementary collection strategies were employed.
 
@@ -95,26 +61,24 @@ Songs were collected using the Genius API via the \texttt{lyricsgenius} Python l
 
 In total, 4,211 raw song objects were retrieved. Lyrics were fetched individually via song ID, as Genius does not return lyrics in search responses.
 
-\subsection{Preprocessing}
+\subsection{Preprocessing}\label{subsec2}
 
 The raw data was processed through the following pipeline:
 
-\begin{enumerate}[leftmargin=*, noitemsep]
+\begin{enumerate}[noitemsep]
     \item \textbf{Deduplication} on (title, artist) pairs.
     \item \textbf{Language filtering} using \texttt{langdetect}; only English songs retained.
-    \item \textbf{Section header removal}: lines matching the pattern \texttt{[\ldots]} (e.g., \texttt{[Chorus]}, \texttt{[Verse 1]}) were stripped.
+    \item \textbf{Section header removal}: lines matching the pattern \texttt{[...]} (e.g., \texttt{[Chorus]}, \texttt{[Verse~1]}) were stripped.
     \item \textbf{Whitespace normalisation}: consecutive blank lines collapsed.
     \item \textbf{Word count filtering}: songs with fewer than 50 or more than 2,000 words excluded.
     \item \textbf{Year validity filter}: songs with no parseable release year or year prior to 1960 excluded.
 \end{enumerate}
 
-The final corpus contains \textbf{3,020 songs}. Table~\ref{tab:corpus} summarises the distribution across genres and decades.
+The final corpus contains \textbf{3,020 songs}. Table~\ref{tab:corpus} summarises the distribution across genres and decades. The dominance of the 2010s (1,015 songs, 33.6\%) reflects the larger digital catalogs of modern artists on Genius. All processed data were stored in a Supabase PostgreSQL database.
 
 \begin{table}[H]
-\centering
-\caption{Corpus distribution by genre and decade.}
-\label{tab:corpus}
-\begin{tabular}{lrrrrrrr|r}
+\caption{Corpus distribution by genre and decade.}\label{tab:corpus}
+\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lrrrrrrr|r}
 \toprule
 \textbf{Genre} & \textbf{1960s} & \textbf{1970s} & \textbf{1980s} & \textbf{1990s} & \textbf{2000s} & \textbf{2010s} & \textbf{2020s} & \textbf{Total} \\
 \midrule
@@ -126,113 +90,92 @@ Country    & 31 & 52 & 41 & 60 & 58 & 141 & 78 & 461 \\
 Electronic & 25 & 60 & 44 & 97 & 40 & 160 & 12 & 438 \\
 \midrule
 \textbf{Total} & 192 & 312 & 298 & 434 & 380 & 1015 & 389 & \textbf{3020} \\
-\bottomrule
-\end{tabular}
+\botrule
+\end{tabular*}
 \end{table}
 
-The dominance of the 2010s (1,015 songs, 33.6\%) reflects the larger digital catalogs of modern artists on Genius. All processed data were stored in a Supabase PostgreSQL database.
-
 % ── 4. Experimental Plan ─────────────────────────────────────────────────────
-\section{Experimental Plan}
+\section{Experimental Plan}\label{sec4}
 
-\subsection{Working Hypotheses}
+\subsection{Working Hypotheses}\label{subsec3}
 
-\begin{enumerate}[leftmargin=*, noitemsep]
+\begin{enumerate}[noitemsep]
     \item \textbf{H1 -- Genre thematic differentiation:} Different genres exhibit statistically distinct thematic profiles. Hip-hop will show stronger identity and social themes; pop and R\&B will show stronger love/romance themes.
     \item \textbf{H2 -- Temporal sentiment shift:} Average lyrical sentiment has changed over decades. We hypothesise a moderate decline in positivity from the 1960s to the 2000s, with a potential rebound in the 2010s--2020s.
     \item \textbf{H3 -- ABSA superiority:} Aspect-based sentiment analysis will reveal lyrical dimensions not captured by a single document-level sentiment label, particularly for emotionally complex songs.
 \end{enumerate}
 
-\subsection{Experimental Design}
+\subsection{Experimental Design}\label{subsec4}
 
-\subsubsection{Fixed Variables}
-\begin{itemize}[leftmargin=*, noitemsep]
+\subsubsection{Fixed Variables}\label{subsubsec1}
+
+\begin{itemize}[noitemsep]
     \item Pre-trained model architectures (no fine-tuning on lyrics)
-    \item Eight predefined lyrical aspects (see Section~\ref{sec:aspect})
+    \item Eight predefined lyrical aspects (see Section~\ref{subsubsec4})
     \item Eight predefined topic labels
     \item Evaluation gold standard (30 songs with manually assigned sentiment labels)
 \end{itemize}
 
-\subsubsection{Free Variables}
-\begin{itemize}[leftmargin=*, noitemsep]
+\subsubsection{Free Variables}\label{subsubsec2}
+
+\begin{itemize}[noitemsep]
     \item Genre and decade filters applied in the dashboard
     \item Aspect confidence threshold (set to 0.25 after ablation)
     \item Minimum sentence count per aspect (set to 1 after ablation)
 \end{itemize}
 
-\subsection{NLP Pipeline}
+\subsection{NLP Pipeline}\label{subsec5}
 
-\subsubsection{Topic Modelling}
-\label{sec:topics}
+\subsubsection{Topic Modelling}\label{subsubsec3}
 
-We experimented with BERTopic \citep{grootendorst2022bertopic} using HDBSCAN clustering (min\_cluster\_size\,=\,30) on sentence-transformer embeddings (\texttt{all-MiniLM-L6-v2}) \citep{reimers2019sentence}. BERTopic discovered only 4 topics due to the high cluster size threshold required to avoid noise; the majority of songs (approximately 90\%) were assigned to a single ``Personal Relationships'' cluster.
+We experimented with BERTopic~\cite{grootendorst2022bertopic} using HDBSCAN clustering (\texttt{min\_cluster\_size=30}) on sentence-transformer embeddings (\texttt{all-MiniLM-L6-v2})~\cite{reimers2019sentence}. BERTopic discovered only 4 topics due to the high cluster size threshold required to avoid noise; the majority of songs (approximately 90\%) were assigned to a single ``Personal Relationships'' cluster.
 
-To address this, we adopted a \textbf{semantic similarity-based topic assignment} method. Eight thematically meaningful topic labels were defined by the team based on lyrical domain knowledge:
-
-\begin{enumerate}[leftmargin=*, noitemsep]
-    \item Love and Romance
-    \item Heartbreak and Loss
-    \item Party and Celebration
-    \item Identity and Self-Expression
-    \item Social Issues and Protest
-    \item Faith and Spirituality
-    \item Money, Power and Success
-    \item Nostalgia and Growing Up
-\end{enumerate}
+To address this, we adopted a \textbf{semantic similarity-based topic assignment} method. Eight thematically meaningful topic labels were defined based on lyrical domain knowledge: (1)~Love and Romance, (2)~Heartbreak and Loss, (3)~Party and Celebration, (4)~Identity and Self-Expression, (5)~Social Issues and Protest, (6)~Faith and Spirituality, (7)~Money, Power and Success, (8)~Nostalgia and Growing Up.
 
 Each label was augmented with eight representative keywords and encoded with \texttt{all-MiniLM-L6-v2}. Each song's embedding was assigned to the topic with the highest cosine similarity. This approach produces interpretable, evenly distributed topics while remaining grounded in the embedding space.
 
-\subsubsection{Sentiment Analysis}
+\subsubsection{Sentiment Analysis}\label{subsubsec4a}
 
-Overall sentiment (positive / neutral / negative) was computed using \path{cardiffnlp/twitter-roberta-base-sentiment-latest} \citep{barbieri2020tweeteval}, a RoBERTa model \citep{liu2019roberta} fine-tuned on 124 million tweets as part of the TweetEval benchmark. Each song's \texttt{clean\_lyrics} field (truncated to 512 tokens) was passed as input. The model outputs a probability distribution over three classes; the argmax was taken as the predicted label, and the associated probability as the sentiment score.
+Overall sentiment (positive / neutral / negative) was computed using the model \path{cardiffnlp/twitter-roberta-base-sentiment-latest}~\cite{barbieri2020tweeteval}, a RoBERTa model~\cite{liu2019roberta} fine-tuned on 124 million tweets as part of the TweetEval benchmark. Each song's lyrics field (truncated to 512 tokens) was passed as input. The model outputs a probability distribution over three classes; the argmax was taken as the predicted label, and the associated probability as the sentiment score.
 
-\subsubsection{Emotion Classification}
+\subsubsection{Emotion Classification}\label{subsubsec4b}
 
-Per-song emotion scores were computed using \path{j-hartmann/emotion-english-distilroberta-base}, a DistilRoBERTa model fine-tuned on emotion-labelled data \citep{demszky2020goemotions}, producing a probability distribution over seven Ekman-inspired emotion categories: joy, sadness, anger, fear, surprise, disgust, and neutral.
+Per-song emotion scores were computed using \path{j-hartmann/emotion-english-distilroberta-base}, a DistilRoBERTa model fine-tuned on emotion-labelled data~\cite{demszky2020goemotions}, producing a probability distribution over seven Ekman-inspired emotion categories: joy, sadness, anger, fear, surprise, disgust, and neutral.
 
-\subsubsection{Aspect-Based Sentiment Analysis}
-\label{sec:aspect}
+\subsubsection{Aspect-Based Sentiment Analysis}\label{subsubsec4}
 
-Aspect-based sentiment analysis (ABSA) was performed using \texttt{facebook/bart-large-mnli} \citep{lewis2020bart} via zero-shot natural language inference, following the entailment-based classification approach of \citet{yin2019zeroshot}. Eight lyrical aspects were defined:
-
-\begin{itemize}[leftmargin=*, noitemsep]
-    \item Love and relationships; Identity and self-expression; Social issues and politics
-    \item Celebration and party; Loss and grief; Money and success
-    \item Nature and environment; Spirituality and faith
-\end{itemize}
+Aspect-based sentiment analysis (ABSA) was performed using \texttt{facebook/bart-large-mnli}~\cite{lewis2020bart} via zero-shot natural language inference, following the entailment-based classification approach of Yin et al.~\cite{yin2019zeroshot}. Eight lyrical aspects were defined: love and relationships; identity and self-expression; social issues and politics; celebration and party; loss and grief; money and success; nature and environment; spirituality and faith.
 
 Each song's lyrics were sentence-tokenised using standard sentence boundary detection. Each sentence was classified against all eight aspects; sentences with a top-class confidence score $\geq 0.25$ were allocated to their dominant aspect bucket. Aspect buckets containing at least one qualifying sentence were passed to the RoBERTa sentiment model to produce an aspect-level sentiment label and score.
 
 An initial threshold of $\geq 0.4$ confidence and $\geq 3$ sentences per aspect produced only 24\% song coverage (730/3,020 songs). Lowering thresholds to $\geq 0.25$ and $\geq 1$ sentence achieved \textbf{97\% coverage} (2,937 songs, 7,357 aspect records).
 
-\subsubsection{Semantic Search and LLM Explanation}
+\subsubsection{Semantic Search and LLM Explanation}\label{subsubsec5}
 
-Song embeddings computed by \texttt{all-MiniLM-L6-v2} were stored as a \texttt{numpy} array. Semantic search encodes the user's query with the same model and retrieves the top-10 songs by cosine similarity. Song explanations were generated using the Groq API (Llama 3.3 70B), which receives song metadata, sentiment, emotion scores, aspect sentiments, and a 500-character lyrics excerpt and generates a four-paragraph literary analysis.
+Song embeddings computed by \texttt{all-MiniLM-L6-v2} were stored as a \texttt{numpy} array. Semantic search encodes the user's query with the same model and retrieves the top-10 songs by cosine similarity. Song explanations were generated using the Groq API (Llama 3.3 70B), which receives song metadata, sentiment, emotion scores, aspect sentiments, and a 500-character lyrics excerpt, and generates a four-paragraph literary analysis.
 
-\subsection{Evaluation Metrics}
+\subsection{Evaluation Metrics}\label{subsec6}
 
-\begin{itemize}[leftmargin=*, noitemsep]
+\begin{itemize}[noitemsep]
     \item \textbf{Topic quality:} Average cosine similarity (confidence) of each song's assignment to its assigned topic centroid.
     \item \textbf{Sentiment accuracy:} Accuracy on a manually curated gold standard of 30 songs with known sentiment labels (10 positive, 10 negative, 10 neutral), drawn from well-known songs with unambiguous emotional content.
     \item \textbf{Aspect coverage:} Percentage of songs with at least one detected aspect-sentiment pair.
 \end{itemize}
 
-\subsection{Reproducibility}
+\subsection{Reproducibility}\label{subsec7}
 
 The full pipeline is reproducible from the public GitHub repository. Collection requires a Genius API key; analysis was run on Google Colab T4 GPU. The \texttt{requirements-pipeline.txt} file pins all library versions. The \texttt{scripts/} directory contains standalone scripts for each pipeline stage. The Supabase database schema and all seed data can be regenerated by running the pipeline in order: \texttt{run\_collection.py} $\to$ \texttt{run\_analysis.py} $\to$ \texttt{remap\_topics.py}.
 
 % ── 5. Results ────────────────────────────────────────────────────────────────
-\section{Results}
+\section{Results}\label{sec5}
 
-\subsection{Topic Distribution}
+\subsection{Topic Distribution}\label{subsec8}
 
-Table~\ref{tab:topics} shows the distribution of songs across the eight discovered topics. Heartbreak and Loss is the dominant theme (46.9\%), consistent with prior computational analysis showing that song lyrics are predominantly concerned with romantic themes \citep{fell2014lyrics}. Love and Romance accounts for a further 24.5\%, together suggesting that approximately 71\% of popular song lyrics centre on romantic experience. Social Issues and Protest (1.5\%) and Faith and Spirituality (1.1\%) are the least represented themes.
+Table~\ref{tab:topics} shows the distribution of songs across the eight discovered topics. Heartbreak and Loss is the dominant theme (46.9\%), consistent with prior computational analysis showing that song lyrics are predominantly concerned with romantic themes~\cite{fell2014lyrics}. Love and Romance accounts for a further 24.5\%, together suggesting that approximately 71\% of popular song lyrics centre on romantic experience. Social Issues and Protest (1.5\%) and Faith and Spirituality (1.1\%) are the least represented themes.
 
 \begin{table}[H]
-\centering
-\caption{Topic distribution across 3,020 songs.}
-\label{tab:topics}
-\begin{tabular}{lrr}
+\caption{Topic distribution across 3,020 songs.}\label{tab:topics}
+\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lrr}
 \toprule
 \textbf{Topic} & \textbf{Songs} & \textbf{Percentage} \\
 \midrule
@@ -246,21 +189,19 @@ Social Issues and Protest     &    45 &  1.5\% \\
 Faith and Spirituality        &    32 &  1.1\% \\
 \midrule
 \textbf{Total}                & 3,020 & 100\%  \\
-\bottomrule
-\end{tabular}
+\botrule
+\end{tabular*}
 \end{table}
 
 The average topic assignment confidence score was \textbf{0.305} (moderate), reflecting the inherent thematic ambiguity of song lyrics, where a single song often addresses multiple themes simultaneously.
 
-\subsection{Sentiment Analysis Results}
+\subsection{Sentiment Analysis Results}\label{subsec9}
 
 The overall corpus sentiment distribution was: neutral 38.7\%, positive 35.3\%, negative 26.0\%. Table~\ref{tab:sentiment} reports average sentiment scores by genre (higher = more positive).
 
 \begin{table}[H]
-\centering
-\caption{Average sentiment score by genre (range 0--1, higher is more positive).}
-\label{tab:sentiment}
-\begin{tabular}{lcc}
+\caption{Average sentiment score by genre (range 0--1, higher is more positive).}\label{tab:sentiment}
+\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lcc}
 \toprule
 \textbf{Genre} & \textbf{Avg Sentiment Score} & \textbf{Rank} \\
 \midrule
@@ -270,22 +211,19 @@ Pop        & 0.668 & 3 \\
 Hip-Hop    & 0.660 & 4 \\
 Country    & 0.649 & 5 \\
 Rock       & 0.640 & 6 (least positive) \\
-\bottomrule
-\end{tabular}
+\botrule
+\end{tabular*}
 \end{table}
 
 These results \textbf{partially support H2}: electronic music showed a marked decline from a high of 0.89 in the 1960s (driven by early synth-pop artists) to approximately 0.66 in later decades. R\&B peaked in the 1980s (0.75). Rock remained consistently the least positive genre throughout all decades, consistent with its association with angst and social critique.
 
-\subsection{Emotion Classification Results}
+\subsection{Emotion Classification Results}\label{subsec10}
 
 Table~\ref{tab:emotion} reports corpus-wide average emotion scores and genre-level averages for the two most discriminative emotions.
 
 \begin{table}[H]
-\centering
-\caption{Average emotion scores across the full corpus and by selected genres.}
-\label{tab:emotion}
-\small
-\begin{tabular}{lccccccc}
+\caption{Average emotion scores across the full corpus and by selected genres.}\label{tab:emotion}
+\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lccccccc}
 \toprule
 \textbf{Scope} & \textbf{Joy} & \textbf{Sadness} & \textbf{Anger} & \textbf{Fear} & \textbf{Surprise} & \textbf{Disgust} & \textbf{Neutral} \\
 \midrule
@@ -295,22 +233,20 @@ Hip-Hop    & 0.059 & $-$ & \textbf{0.297} & $-$ & $-$ & $-$ & $-$ \\
 R\&B       & \textbf{0.164} & $-$ & 0.123 & $-$ & $-$ & $-$ & $-$ \\
 Country    & 0.113 & $-$ & 0.102 & $-$ & $-$ & $-$ & $-$ \\
 Rock       & 0.082 & $-$ & 0.125 & $-$ & $-$ & $-$ & $-$ \\
-\bottomrule
-\end{tabular}
-\normalsize
+\botrule
+\end{tabular*}
+\footnotetext{Note: $-$ indicates columns not reported for genre-level rows; only Joy and Anger are shown as the two most discriminative emotions.}
 \end{table}
 
 Hip-hop exhibits the highest anger score (0.297), nearly twice the corpus average (0.151), \textbf{supporting H1}. R\&B shows the highest joy (0.164), consistent with its sentiment ranking. Neutral is the most frequent label corpus-wide (0.223), reflecting the prevalence of storytelling and descriptive lyrics that do not strongly express a single emotion.
 
-\subsection{Aspect-Based Sentiment Results}
+\subsection{Aspect-Based Sentiment Results}\label{subsec11}
 
 Table~\ref{tab:absa} shows the distribution of aspect-sentiment pairs across the 7,357 records.
 
 \begin{table}[H]
-\centering
-\caption{Aspect-based sentiment analysis: aspect distribution and sentiment breakdown.}
-\label{tab:absa}
-\begin{tabular}{p{5.5cm}rrrr}
+\caption{Aspect-based sentiment analysis: aspect distribution and sentiment breakdown.}\label{tab:absa}
+\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lrrrr}
 \toprule
 \textbf{Aspect} & \textbf{Records} & \textbf{Positive} & \textbf{Neutral} & \textbf{Negative} \\
 \midrule
@@ -324,85 +260,64 @@ Nature and environment       &   237 & 24\% & 52\% & 24\% \\
 Social issues and politics   &    32 & 19\% & 34\% & 47\% \\
 \midrule
 \textbf{Total}               & 7,357 & 25.5\% & 50.6\% & 23.9\% \\
-\bottomrule
-\end{tabular}
+\botrule
+\end{tabular*}
 \end{table}
 
-These results \textbf{support H3}: songs that receive an overall ``positive'' sentiment label may simultaneously express negativity in specific aspects. For example, a song classified as positive overall may express negative sentiment towards ``loss and grief'' while expressing positive sentiment towards ``celebration and party.'' This richer representation is not captured by a single document-level label.
+These results \textbf{support H3}: songs that receive an overall ``positive'' sentiment label may simultaneously express negativity in specific aspects. For example, a song classified as positive overall may express negative sentiment towards ``loss and grief'' while expressing positive sentiment towards ``celebration and party.'' This richer representation is not captured by a single document-level label. Social issues and politics shows the highest negative rate (47\%), consistent with the protest function of politically engaged music.
 
-Social issues and politics shows the highest negative rate (47\%), consistent with the protest function of politically engaged music. Celebration and party shows the highest positive rate (41\%), as expected.
+\subsection{Evaluation Results}\label{subsec12}
 
-\subsection{Evaluation Results}
+\subsubsection{Topic Quality}\label{subsubsec6}
 
-\subsubsection{Topic Quality}
 Average topic confidence across all 3,020 songs was \textbf{0.305}, rated moderate. Per-topic confidence ranged from 0.238 (Social Issues and Protest) to 0.326 (Love and Romance). The moderate score reflects the inherent multi-thematic nature of lyrics; a song about heartbreak may also contain party and love imagery, making clean boundaries impossible.
 
-\subsubsection{Sentiment Accuracy}
-Evaluation against a gold standard of 30 manually labelled songs (10 positive, 10 negative, 10 neutral, selected to be clearly representative of their class) yielded \textbf{15 songs matched} in the corpus and an accuracy of \textbf{46.7\%} (7/15) on matched songs. Per-class accuracy: positive 33\%, negative 50\%, neutral 50\%.
+\subsubsection{Sentiment Accuracy}\label{subsubsec7}
 
-This below-chance result is attributable to three factors: (1) domain mismatch -- the RoBERTa model was fine-tuned on Twitter data, not song lyrics; (2) lyrical complexity -- many songs express conflicting emotions across verses, making a single correct label debatable; (3) small matched sample -- only 15 of 30 gold songs appeared in the corpus.
+Evaluation against a gold standard of 30 manually labelled songs (10 positive, 10 negative, 10 neutral) yielded \textbf{15 songs matched} in the corpus and an accuracy of \textbf{46.7\%} (7/15) on matched songs. Per-class accuracy: positive 33\%, negative 50\%, neutral 50\%.
 
-Importantly, this result motivates the ABSA approach: rather than assigning one debatable global label, aspect-based analysis captures the emotional texture at a finer granularity (H3 supported).
+This below-chance result is attributable to three factors: (1) domain mismatch --- the RoBERTa model was fine-tuned on Twitter data, not song lyrics; (2) lyrical complexity --- many songs express conflicting emotions across verses, making a single correct label debatable; (3) small matched sample --- only 15 of 30 gold songs appeared in the corpus. This result motivates the ABSA approach: rather than assigning one debatable global label, aspect-based analysis captures the emotional texture at a finer granularity (H3 supported).
 
 % ── 6. Discussion ────────────────────────────────────────────────────────────
-\section{Discussion}
+\section{Discussion}\label{sec6}
 
-\subsection{Key Findings}
+\subsection{Key Findings}\label{subsec13}
 
-The dominant finding is the overwhelming prevalence of romantic themes in popular song lyrics (71.4\% of songs fall under Love/Romance or Heartbreak/Loss). This is consistent with musicological literature and provides a data-driven confirmation at scale. The temporal analysis reveals that electronic music underwent a substantial sentiment shift from the 1960s to the 1980s, likely reflecting the evolution from early experimental synth music to commercial dance music.
+The dominant finding is the overwhelming prevalence of romantic themes in popular song lyrics (71.4\% of songs fall under Love/Romance or Heartbreak/Loss). This is consistent with musicological literature and provides a data-driven confirmation at scale. The temporal analysis reveals that electronic music underwent a substantial sentiment shift from the 1960s to the 1980s, likely reflecting the evolution from early experimental synth music to commercial dance music. Genre-level emotion profiles yield intuitive results: hip-hop's anger dominance aligns with the genre's roots in social protest and assertive self-expression, while R\&B's joy leadership is consistent with its soulful, celebratory tradition.
 
-Genre-level emotion profiles yield intuitive results: hip-hop's anger dominance aligns with the genre's roots in social protest and assertive self-expression, while R\&B's joy leadership is consistent with its soulful, celebratory tradition.
+\subsection{Limitations}\label{subsec14}
 
-\subsection{Limitations}
-
-\begin{itemize}[leftmargin=*, noitemsep]
-    \item \textbf{Corpus size:} The target of 5,000 songs was not reached; 3,020 songs were collected after deduplication and filtering. The Genius API returns limited unique results per search query, and the artist-based supplementary collection improved but did not close this gap.
+\begin{itemize}[noitemsep]
+    \item \textbf{Corpus size:} The target of 5,000 songs was not reached; 3,020 songs were collected after deduplication and filtering. The Genius API returns limited unique results per search query.
     \item \textbf{Model domain mismatch:} All sentiment and emotion models were pre-trained on social media text (Twitter). Song lyrics have different register, vocabulary, and narrative structure, which reduces transfer accuracy.
-    \item \textbf{Topic granularity:} The semantic similarity approach to topic assignment is supervised by the predefined label set and does not discover novel themes. A fully unsupervised BERTopic approach with tuned parameters would be preferable but was constrained by compute limitations on the free Colab tier.
+    \item \textbf{Topic granularity:} The semantic similarity approach is supervised by the predefined label set and does not discover novel themes. A fully unsupervised BERTopic approach would be preferable but was constrained by compute limitations on the free Colab tier.
     \item \textbf{Decade imbalance:} The 2010s account for 33.6\% of the corpus, which may bias decade-level trend analyses.
     \item \textbf{Aspect coverage:} Although 97\% of songs have at least one aspect-sentiment record, the threshold relaxation (0.25 confidence, 1 sentence minimum) may introduce lower-quality records for some songs.
 \end{itemize}
 
-\subsection{Future Work}
+\subsection{Future Work}\label{subsec15}
 
-Future improvements could include: (1) fine-tuning RoBERTa on a lyrics-specific sentiment dataset to address domain mismatch; (2) running BERTopic with lower cluster size parameters on a dedicated GPU to enable fully unsupervised topic discovery; (3) extending the corpus to 5,000+ songs via additional API sources (Spotify, MusicBrainz); (4) incorporating audio features (tempo, key, mode) to correlate acoustic and lyrical sentiment.
+Future improvements could include: (1) fine-tuning RoBERTa on a lyrics-specific sentiment dataset; (2) running BERTopic with lower cluster size parameters on a dedicated GPU; (3) extending the corpus to 5,000+ songs via additional API sources (Spotify, MusicBrainz); (4) incorporating audio features (tempo, key, mode) to correlate acoustic and lyrical sentiment.
 
 % ── 7. System Architecture ────────────────────────────────────────────────────
-\section{System Architecture and Dashboard}
+\section{System Architecture and Dashboard}\label{sec7}
 
-\subsection{Architecture Overview}
+\subsection{Architecture Overview}\label{subsec16}
 
-The system follows a modular pipeline architecture with four stages:
-
-\begin{enumerate}[leftmargin=*, noitemsep]
-    \item \textbf{Collection:} Genius API $\to$ \texttt{lyricsgenius} $\to$ raw JSON checkpoints
-    \item \textbf{Preprocessing:} Language detection, cleaning, filtering $\to$ Supabase \texttt{songs} table
-    \item \textbf{Analysis:} RoBERTa + DistilRoBERTa + BART $\to$ Supabase \texttt{sentiments}, \texttt{aspect\_sentiments}, \texttt{topics} tables
-    \item \textbf{Presentation:} Streamlit dashboard $\to$ Supabase reads $\to$ Plotly charts
-\end{enumerate}
+The system follows a modular pipeline architecture with four stages: (1)~\textbf{Collection:} Genius API $\to$ \texttt{lyricsgenius} $\to$ raw JSON checkpoints; (2)~\textbf{Preprocessing:} language detection, cleaning, filtering $\to$ Supabase \texttt{songs} table; (3)~\textbf{Analysis:} RoBERTa + DistilRoBERTa + BART $\to$ Supabase \texttt{sentiments}, \texttt{aspect\_sentiments}, \texttt{topics} tables; (4)~\textbf{Presentation:} Streamlit dashboard $\to$ Supabase reads $\to$ Plotly charts.
 
 The analysis stage was executed on Google Colab T4 GPU (free tier); collection and topic remapping ran locally on CPU. All results are persisted in Supabase, enabling the deployed dashboard to read live data without local dependencies.
 
-\subsection{Dashboard Pages}
+\subsection{Dashboard Pages}\label{subsec17}
 
-The interactive dashboard (\url{https://lyrics-analyzer-jpsnn8dlcivnnmyrfetng8.streamlit.app/}) provides five analytical views:
-
-\begin{enumerate}[leftmargin=*, noitemsep]
-    \item \textbf{Home:} Corpus overview with decade and genre distribution charts.
-    \item \textbf{Theme Explorer:} Stacked bar chart of topic distribution by decade; genre $\times$ theme heatmap; topic keyword visualisation.
-    \item \textbf{Sentiment \& Emotion Trends:} Sentiment score line chart by genre across decades; stacked area chart of emotion mix over time.
-    \item \textbf{Genre Comparison:} Sentiment ranking bar chart; emotion profile heatmap; grouped sentiment by decade; radar chart comparing two genres.
-    \item \textbf{Semantic Song Search:} Free-text query encoded with \texttt{all-MiniLM-L6-v2}; top-10 results by cosine similarity.
-    \item \textbf{AI Song Explainer:} Per-song emotion chart and LLM-generated four-paragraph analysis via Groq Llama 3.3 70B.
-\end{enumerate}
+The interactive dashboard provides six analytical views: (1)~\textbf{Home} --- corpus overview with decade and genre distribution charts; (2)~\textbf{Theme Explorer} --- stacked bar chart of topic distribution by decade, genre $\times$ theme heatmap, topic keyword visualisation; (3)~\textbf{Sentiment \& Emotion Trends} --- sentiment score line chart by genre across decades, stacked area chart of emotion mix over time; (4)~\textbf{Genre Comparison} --- sentiment ranking bar chart, emotion profile heatmap, grouped sentiment by decade, radar chart comparing two genres; (5)~\textbf{Semantic Song Search} --- free-text query encoded with \texttt{all-MiniLM-L6-v2}, top-10 results by cosine similarity; (6)~\textbf{AI Song Explainer} --- per-song emotion chart and LLM-generated four-paragraph analysis via Groq Llama 3.3 70B.
 
 % ── 8. Team Contributions ─────────────────────────────────────────────────────
-\section{Team Contributions}
+\section{Team Contributions}\label{sec8}
 
 \begin{table}[H]
-\centering
-\caption{Team member contributions.}
-\begin{tabular}{p{4cm}p{9cm}}
+\caption{Team member contributions.}\label{tab:team}
+\begin{tabular*}{\textwidth}{@{\extracolsep\fill}p{4cm}p{9cm}}
 \toprule
 \textbf{Team Member} & \textbf{Primary Contribution} \\
 \midrule
@@ -410,72 +325,70 @@ Harshit Jain         & Data collection, API integration, preprocessing pipeline,
 Geethan Thallam      & Topic modelling, LLM-assisted theme labelling \\
 Parsh Jadon          & Sentiment and emotion analysis, aspect-based sentiment analysis, evaluation \\
 Irfan Ahmed Mohammed & Dashboard development, visualisations, song explainer integration \\
-\midrule
-\multicolumn{2}{l}{\small\textit{All team members contributed to integration, testing, and report writing.}} \\
-\bottomrule
-\end{tabular}
+\botrule
+\end{tabular*}
+\footnotetext{All team members contributed to integration, testing, and report writing.}
 \end{table}
 
 % ── 9. Conclusion ─────────────────────────────────────────────────────────────
-\section{Conclusion}
+\section{Conclusion}\label{sec9}
 
-We presented the Song Lyrics Thematic Analyzer, a complete NLP pipeline and interactive dashboard for large-scale lyrical analysis. The system processes 3,020 songs across six genres and seven decades, applying sentiment analysis, emotion classification, and aspect-based sentiment analysis to reveal culturally meaningful patterns. Key findings confirm that heartbreak and romantic themes dominate popular lyrics (71.4\%), R\&B is the most positive genre, and hip-hop exhibits distinctly elevated anger scores. The aspect-based approach successfully captures emotional nuances that single-label sentiment classification misses, supporting its use for complex, multi-thematic documents such as song lyrics.
-
-The deployed Streamlit dashboard provides an accessible interface for exploring these findings interactively, including semantic search and LLM-assisted song explanation. Source code and data pipeline are fully documented and publicly available.
+We presented the Song Lyrics Thematic Analyzer, a complete NLP pipeline and interactive dashboard for large-scale lyrical analysis. The system processes 3,020 songs across six genres and seven decades, applying sentiment analysis, emotion classification, and aspect-based sentiment analysis to reveal culturally meaningful patterns. Key findings confirm that heartbreak and romantic themes dominate popular lyrics (71.4\%), R\&B is the most positive genre, and hip-hop exhibits distinctly elevated anger scores. The aspect-based approach successfully captures emotional nuances that single-label sentiment classification misses, supporting its use for complex, multi-thematic documents such as song lyrics. The deployed Streamlit dashboard provides an accessible interface for exploring these findings interactively, including semantic search and LLM-assisted song explanation.
 
 % ── References ────────────────────────────────────────────────────────────────
-\bibliographystyle{plainnat}
-\begin{thebibliography}{99}
+\backmatter
 
-\bibitem[Vaswani et~al.(2017)]{vaswani2017attention}
-Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.~N., Kaiser, L., and Polosukhin, I. (2017).
+\begin{thebibliography}{10}
+
+\bibitem{vaswani2017attention}
+Vaswani A, Shazeer N, Parmar N, Uszkoreit J, Jones L, Gomez AN, Kaiser L, Polosukhin I.
 Attention is all you need.
-In \textit{Advances in Neural Information Processing Systems (NeurIPS)}, volume 30, pages 5998--6008.
+In: Advances in Neural Information Processing Systems (NeurIPS). 2017;30:5998--6008.
 
-\bibitem[Devlin et~al.(2019)]{devlin2019bert}
-Devlin, J., Chang, M.-W., Lee, K., and Toutanova, K. (2019).
+\bibitem{devlin2019bert}
+Devlin J, Chang MW, Lee K, Toutanova K.
 BERT: Pre-training of deep bidirectional transformers for language understanding.
-In \textit{Proceedings of NAACL-HLT 2019}, pages 4171--4186.
+In: Proceedings of NAACL-HLT. 2019:4171--4186.
 
-\bibitem[Liu et~al.(2019)]{liu2019roberta}
-Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O., Lewis, M., Zettlemoyer, L., and Stoyanov, V. (2019).
+\bibitem{liu2019roberta}
+Liu Y, Ott M, Goyal N, Du J, Joshi M, Chen D, Levy O, Lewis M, Zettlemoyer L, Stoyanov V.
 RoBERTa: A robustly optimized BERT pretraining approach.
-\textit{arXiv preprint arXiv:1907.11692}.
+arXiv preprint arXiv:1907.11692. 2019.
 
-\bibitem[Lewis et~al.(2020)]{lewis2020bart}
-Lewis, M., Liu, Y., Goyal, N., Ghazvininejad, M., Mohamed, A., Levy, O., Stoyanov, V., and Zettlemoyer, L. (2020).
+\bibitem{lewis2020bart}
+Lewis M, Liu Y, Goyal N, Ghazvininejad M, Mohamed A, Levy O, Stoyanov V, Zettlemoyer L.
 BART: Denoising sequence-to-sequence pre-training for natural language generation, translation, and comprehension.
-In \textit{Proceedings of ACL 2020}, pages 7871--7880.
+In: Proceedings of ACL. 2020:7871--7880.
 
-\bibitem[Reimers and Gurevych(2019)]{reimers2019sentence}
-Reimers, N. and Gurevych, I. (2019).
+\bibitem{reimers2019sentence}
+Reimers N, Gurevych I.
 Sentence-BERT: Sentence embeddings using Siamese BERT-networks.
-In \textit{Proceedings of EMNLP-IJCNLP 2019}, pages 3982--3992.
+In: Proceedings of EMNLP-IJCNLP. 2019:3982--3992.
 
-\bibitem[Grootendorst(2022)]{grootendorst2022bertopic}
-Grootendorst, M. (2022).
+\bibitem{grootendorst2022bertopic}
+Grootendorst M.
 BERTopic: Neural topic modeling with a class-based TF-IDF procedure.
-\textit{arXiv preprint arXiv:2203.05794}.
+arXiv preprint arXiv:2203.05794. 2022.
 
-\bibitem[Barbieri et~al.(2020)]{barbieri2020tweeteval}
-Barbieri, F., Camacho-Collados, J., Espinosa-Anke, L., and Neves, L. (2020).
+\bibitem{barbieri2020tweeteval}
+Barbieri F, Camacho-Collados J, Espinosa-Anke L, Neves L.
 TweetEval: Unified benchmark and comparative evaluation for tweet classification.
-In \textit{Findings of EMNLP 2020}, pages 1644--1650.
+In: Findings of EMNLP. 2020:1644--1650.
 
-\bibitem[Yin et~al.(2019)]{yin2019zeroshot}
-Yin, W., Hay, J., and Roth, D. (2019).
+\bibitem{yin2019zeroshot}
+Yin W, Hay J, Roth D.
 Benchmarking zero-shot text classification: Datasets, evaluation and entailment approach.
-In \textit{Proceedings of EMNLP-IJCNLP 2019}, pages 3914--3923.
+In: Proceedings of EMNLP-IJCNLP. 2019:3914--3923.
 
-\bibitem[Demszky et~al.(2020)]{demszky2020goemotions}
-Demszky, D., Movshovitz-Attias, D., Ko, J., Cowen, A., Nemade, G., and Ravi, S. (2020).
+\bibitem{demszky2020goemotions}
+Demszky D, Movshovitz-Attias D, Ko J, Cowen A, Nemade G, Ravi S.
 GoEmotions: A dataset of fine-grained emotions.
-In \textit{Proceedings of ACL 2020}, pages 4040--4054.
+In: Proceedings of ACL. 2020:4040--4054.
 
-\bibitem[Fell and Sporleder(2014)]{fell2014lyrics}
-Fell, M. and Sporleder, C. (2014).
+\bibitem{fell2014lyrics}
+Fell M, Sporleder C.
 Lyrics-based analysis and classification of music.
-In \textit{Proceedings of COLING 2014}, pages 620--631.
+In: Proceedings of COLING. 2014:620--631.
 
 \end{thebibliography}
 

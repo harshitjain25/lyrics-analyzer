@@ -5,7 +5,6 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{booktabs}
 \usepackage{xcolor}
-\usepackage{float}
 \usepackage{enumitem}
 \usepackage{url}
 \usepackage{array}
@@ -76,9 +75,9 @@ The raw data was processed through the following pipeline:
 
 The final corpus contains \textbf{3,020 songs}. Table~\ref{tab:corpus} summarises the distribution across genres and decades. The dominance of the 2010s (1,015 songs, 33.6\%) reflects the larger digital catalogs of modern artists on Genius. All processed data were stored in a Supabase PostgreSQL database.
 
-\begin{table}[H]
+\begin{table}[h]
 \caption{Corpus distribution by genre and decade.}\label{tab:corpus}
-\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lrrrrrrr|r}
+\begin{tabular}{@{}lrrrrrrr|r@{}}
 \toprule
 \textbf{Genre} & \textbf{1960s} & \textbf{1970s} & \textbf{1980s} & \textbf{1990s} & \textbf{2000s} & \textbf{2010s} & \textbf{2020s} & \textbf{Total} \\
 \midrule
@@ -91,7 +90,7 @@ Electronic & 25 & 60 & 44 & 97 & 40 & 160 & 12 & 438 \\
 \midrule
 \textbf{Total} & 192 & 312 & 298 & 434 & 380 & 1015 & 389 & \textbf{3020} \\
 \botrule
-\end{tabular*}
+\end{tabular}
 \end{table}
 
 % ── 4. Experimental Plan ─────────────────────────────────────────────────────
@@ -173,9 +172,9 @@ The full pipeline is reproducible from the public GitHub repository. Collection 
 
 Table~\ref{tab:topics} shows the distribution of songs across the eight discovered topics. Heartbreak and Loss is the dominant theme (46.9\%), consistent with prior computational analysis showing that song lyrics are predominantly concerned with romantic themes~\cite{fell2014lyrics}. Love and Romance accounts for a further 24.5\%, together suggesting that approximately 71\% of popular song lyrics centre on romantic experience. Social Issues and Protest (1.5\%) and Faith and Spirituality (1.1\%) are the least represented themes.
 
-\begin{table}[H]
+\begin{table}[h]
 \caption{Topic distribution across 3,020 songs.}\label{tab:topics}
-\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lrr}
+\begin{tabular}{@{}lrr@{}}
 \toprule
 \textbf{Topic} & \textbf{Songs} & \textbf{Percentage} \\
 \midrule
@@ -190,7 +189,7 @@ Faith and Spirituality        &    32 &  1.1\% \\
 \midrule
 \textbf{Total}                & 3,020 & 100\%  \\
 \botrule
-\end{tabular*}
+\end{tabular}
 \end{table}
 
 The average topic assignment confidence score was \textbf{0.305} (moderate), reflecting the inherent thematic ambiguity of song lyrics, where a single song often addresses multiple themes simultaneously.
@@ -199,9 +198,9 @@ The average topic assignment confidence score was \textbf{0.305} (moderate), ref
 
 The overall corpus sentiment distribution was: neutral 38.7\%, positive 35.3\%, negative 26.0\%. Table~\ref{tab:sentiment} reports average sentiment scores by genre (higher = more positive).
 
-\begin{table}[H]
+\begin{table}[h]
 \caption{Average sentiment score by genre (range 0--1, higher is more positive).}\label{tab:sentiment}
-\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lcc}
+\begin{tabular}{@{}lcc@{}}
 \toprule
 \textbf{Genre} & \textbf{Avg Sentiment Score} & \textbf{Rank} \\
 \midrule
@@ -212,7 +211,7 @@ Hip-Hop    & 0.660 & 4 \\
 Country    & 0.649 & 5 \\
 Rock       & 0.640 & 6 (least positive) \\
 \botrule
-\end{tabular*}
+\end{tabular}
 \end{table}
 
 These results \textbf{partially support H2}: electronic music showed a marked decline from a high of 0.89 in the 1960s (driven by early synth-pop artists) to approximately 0.66 in later decades. R\&B peaked in the 1980s (0.75). Rock remained consistently the least positive genre throughout all decades, consistent with its association with angst and social critique.
@@ -221,9 +220,9 @@ These results \textbf{partially support H2}: electronic music showed a marked de
 
 Table~\ref{tab:emotion} reports corpus-wide average emotion scores and genre-level averages for the two most discriminative emotions.
 
-\begin{table}[H]
+\begin{table}[h]
 \caption{Average emotion scores across the full corpus and by selected genres.}\label{tab:emotion}
-\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lccccccc}
+\begin{tabular}{@{}lccccccc@{}}
 \toprule
 \textbf{Scope} & \textbf{Joy} & \textbf{Sadness} & \textbf{Anger} & \textbf{Fear} & \textbf{Surprise} & \textbf{Disgust} & \textbf{Neutral} \\
 \midrule
@@ -234,7 +233,7 @@ R\&B       & \textbf{0.164} & $-$ & 0.123 & $-$ & $-$ & $-$ & $-$ \\
 Country    & 0.113 & $-$ & 0.102 & $-$ & $-$ & $-$ & $-$ \\
 Rock       & 0.082 & $-$ & 0.125 & $-$ & $-$ & $-$ & $-$ \\
 \botrule
-\end{tabular*}
+\end{tabular}
 \footnotetext{Note: $-$ indicates columns not reported for genre-level rows; only Joy and Anger are shown as the two most discriminative emotions.}
 \end{table}
 
@@ -244,9 +243,9 @@ Hip-hop exhibits the highest anger score (0.297), nearly twice the corpus averag
 
 Table~\ref{tab:absa} shows the distribution of aspect-sentiment pairs across the 7,357 records.
 
-\begin{table}[H]
+\begin{table}[h]
 \caption{Aspect-based sentiment analysis: aspect distribution and sentiment breakdown.}\label{tab:absa}
-\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lrrrr}
+\begin{tabular}{@{}lrrrr@{}}
 \toprule
 \textbf{Aspect} & \textbf{Records} & \textbf{Positive} & \textbf{Neutral} & \textbf{Negative} \\
 \midrule
@@ -261,7 +260,7 @@ Social issues and politics   &    32 & 19\% & 34\% & 47\% \\
 \midrule
 \textbf{Total}               & 7,357 & 25.5\% & 50.6\% & 23.9\% \\
 \botrule
-\end{tabular*}
+\end{tabular}
 \end{table}
 
 These results \textbf{support H3}: songs that receive an overall ``positive'' sentiment label may simultaneously express negativity in specific aspects. For example, a song classified as positive overall may express negative sentiment towards ``loss and grief'' while expressing positive sentiment towards ``celebration and party.'' This richer representation is not captured by a single document-level label. Social issues and politics shows the highest negative rate (47\%), consistent with the protest function of politically engaged music.
@@ -315,9 +314,9 @@ The interactive dashboard provides six analytical views: (1)~\textbf{Home} --- c
 % ── 8. Team Contributions ─────────────────────────────────────────────────────
 \section{Team Contributions}\label{sec8}
 
-\begin{table}[H]
+\begin{table}[h]
 \caption{Team member contributions.}\label{tab:team}
-\begin{tabular*}{\textwidth}{@{\extracolsep\fill}p{4cm}p{9cm}}
+\begin{tabular}{@{}p{4cm}p{9cm}@{}}
 \toprule
 \textbf{Team Member} & \textbf{Primary Contribution} \\
 \midrule
@@ -326,7 +325,7 @@ Geethan Thallam      & Topic modelling, LLM-assisted theme labelling \\
 Parsh Jadon          & Sentiment and emotion analysis, aspect-based sentiment analysis, evaluation \\
 Irfan Ahmed Mohammed & Dashboard development, visualisations, song explainer integration \\
 \botrule
-\end{tabular*}
+\end{tabular}
 \footnotetext{All team members contributed to integration, testing, and report writing.}
 \end{table}
 
